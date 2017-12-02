@@ -71,7 +71,7 @@ You have two alternatives:
    enable the compiler plugin in your project.
    This step should work similarly for other build tools than sbt.
 
-See an example manual installation in [test-workspace/build.sbt](test-workspace/build.sbt).
+See an example manual installation in [build.sbt](test-workspace/build.sbt).
 
 ## Unit tests
 

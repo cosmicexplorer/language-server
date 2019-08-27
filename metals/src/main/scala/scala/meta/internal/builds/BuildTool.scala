@@ -12,7 +12,10 @@ abstract class BuildTool {
       config: MetalsServerConfig
   ): List[String]
 
-  def digest(workspace: AbsolutePath): Option[String]
+  def digest(
+      workspace: AbsolutePath,
+      userConfig: UserConfiguration
+  ): Option[String]
 
   def version: String
 

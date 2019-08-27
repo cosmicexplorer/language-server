@@ -714,14 +714,20 @@ class MetalsLanguageServer(
           errors.foreach { error =>
             scribe.error(s"config error: $error")
           }
+          Future.successful(())
         case Right(value) =>
           val old = userConfig
           userConfig = value
           if (userConfig.symbolPrefixes != old.symbolPrefixes) {
             compilers.restartAll()
           }
+          if (userConfig.pantsTargets != old.pantsTargets) {
+            slowConnectToBuildServer(forceImport = false).ignoreValue
+          } else {
+            Future.successful(())
+          }
       }
-    }.asJava
+    }.flatten.asJava
 
   @JsonNotification("workspace/didChangeWatchedFiles")
   def didChangeWatchedFiles(
@@ -1160,7 +1166,7 @@ class MetalsLanguageServer(
             buildTool.minimumVersion,
             buildTool.version
           )) {
-          buildTool.digest(workspace) match {
+          buildTool.digest(workspace, userConfig) match {
             case None =>
               scribe.warn(s"Skipping build import, no checksum.")
               Future.successful(BuildChange.None)

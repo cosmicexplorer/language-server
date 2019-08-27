@@ -3,11 +3,11 @@ package scala.meta.internal.builds
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.security.MessageDigest
-
 import scala.meta.internal.builds.Digest.Status
 import scala.meta.internal.io.PathIO
-import scala.meta.internal.mtags.MD5
 import scala.meta.internal.metals.MetalsEnrichments._
+import scala.meta.internal.metals.UserConfiguration
+import scala.meta.internal.mtags.{ListFiles, MD5}
 import scala.meta.io.AbsolutePath
 import scala.util.control.NonFatal
 import scala.xml.Node
@@ -88,6 +88,7 @@ object Digest {
         path.toString().endsWith(_)
       )
     val isXml = ext == "xml"
+    val isBUILD = path.toNIO.endsWith("BUILD")
 
     if (isScala && path.isFile) {
       digestScala(path, digest)
@@ -95,6 +96,8 @@ object Digest {
       digestGeneralJvm(path, digest)
     } else if (isXml) {
       digestXml(path, digest)
+    } else if (isBUILD) {
+      digestFileBytes(path, digest)
     } else {
       true
     }
@@ -173,7 +176,10 @@ object Digest {
 }
 
 trait Digestable {
-  def current(workspace: AbsolutePath): Option[String] = {
+  def current(
+      workspace: AbsolutePath,
+      userConfig: UserConfiguration
+  ): Option[String] = {
     if (!workspace.isDirectory) None
     else {
       val digest = MessageDigest.getInstance("MD5")
@@ -183,7 +189,7 @@ trait Digestable {
         digest.update(Digest.version.getBytes(StandardCharsets.UTF_8))
       }
 
-      val isSuccess = digestWorkspace(workspace, digest)
+      val isSuccess = digestWorkspace(workspace, digest, userConfig)
       if (isSuccess) Some(MD5.bytesToHex(digest.digest()))
       else None
     }
@@ -191,6 +197,7 @@ trait Digestable {
 
   protected def digestWorkspace(
       absolutePath: AbsolutePath,
-      digest: MessageDigest
+      digest: MessageDigest,
+      userConfig: UserConfiguration
   ): Boolean
 }

@@ -75,6 +75,7 @@ final class BuildTools(
     else if (isGradle) Some(GradleBuildTool())
     else if (isMaven) Some(MavenBuildTool())
     else if (isMill) Some(MillBuildTool())
+    else if (isPants) Some(PantsBuildTool())
     else None
   }
   override def toString: String = {
@@ -87,6 +88,7 @@ final class BuildTools(
     else if (isGradle) GradleBuildTool.isGradleRelatedPath(workspace, path)
     else if (isMaven) MavenBuildTool.isMavenRelatedPath(workspace, path)
     else if (isMill) MillBuildTool.isMillRelatedPath(workspace, path)
+    else if (isPants) PantsBuildTool.isPantsRelatedPath(workspace, path)
     else false
   }
 }

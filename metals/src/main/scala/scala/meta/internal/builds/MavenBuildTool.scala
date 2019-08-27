@@ -52,8 +52,12 @@ case class MavenBuildTool() extends BuildTool {
     }
   }
 
-  def digest(workspace: AbsolutePath): Option[String] =
-    MavenDigest.current(workspace)
+  def digest(
+      workspace: AbsolutePath,
+      userConfig: UserConfiguration
+  ): Option[String] = {
+    MavenDigest.current(workspace, userConfig)
+  }
 
   override def minimumVersion: String = "3.5.2"
 

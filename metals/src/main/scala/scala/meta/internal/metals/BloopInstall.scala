@@ -163,7 +163,7 @@ final class BloopInstall(
       status: Status,
       buildTool: BuildTool
   ): Unit = {
-    buildTool.digest(workspace).foreach { checksum =>
+    buildTool.digest(workspace, userConfig()).foreach { checksum =>
       tables.digests.setStatus(checksum, status)
     }
   }

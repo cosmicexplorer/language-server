@@ -3,11 +3,16 @@ package scala.meta.internal.builds
 import java.security.MessageDigest
 import scala.meta.io.AbsolutePath
 import scala.meta.internal.metals.MetalsEnrichments._
+import scala.meta.internal.metals.UserConfiguration
+import scala.meta.internal.mtags.MtagsEnrichments._
+import scala.meta.internal.mtags.WalkFiles
+import scala.meta.io.AbsolutePath
 
 object MavenDigest extends Digestable {
   override protected def digestWorkspace(
       workspace: AbsolutePath,
-      digest: MessageDigest
+      digest: MessageDigest,
+      userConfig: UserConfiguration
   ): Boolean = {
     workspace.listRecursive.forall {
       case file if file.filename == "pom.xml" =>

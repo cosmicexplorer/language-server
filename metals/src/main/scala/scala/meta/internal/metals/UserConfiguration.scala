@@ -25,7 +25,8 @@ case class UserConfiguration(
     scalafmtConfigPath: RelativePath =
       UserConfiguration.default.scalafmtConfigPath,
     symbolPrefixes: Map[String, String] =
-      UserConfiguration.default.symbolPrefixes
+      UserConfiguration.default.symbolPrefixes,
+    pantsTargets: Option[String] = None
 )
 object UserConfiguration {
 
@@ -91,6 +92,16 @@ object UserConfiguration {
       """Optional custom path to the .scalafmt.conf file.
         |Should be relative to the workspace root directory and use forward slashes / for file
         |separators (even on Windows).
+        |""".stripMargin
+    ),
+    // TODO: add description
+    UserConfigurationOption(
+      "pants-targets",
+      """empty string `""`.""",
+      "::/",
+      "pants script",
+      """. List of pants targets
+        |Should be relative to the workspace root directory and use forward slashes / for file
         |""".stripMargin
     )
   )
@@ -166,6 +177,9 @@ object UserConfiguration {
     errors ++= symbolPrefixes.keys.flatMap { sym =>
       Symbol.validated(sym).left.toOption
     }
+    val pantsTargets =
+      getStringKey("pants-targets")
+    pprint.log(pantsTargets)
 
     if (errors.isEmpty) {
       Right(
@@ -176,7 +190,8 @@ object UserConfiguration {
           mavenScript,
           millScript,
           scalafmtConfigPath,
-          symbolPrefixes
+          symbolPrefixes,
+          pantsTargets
         )
       )
     } else {

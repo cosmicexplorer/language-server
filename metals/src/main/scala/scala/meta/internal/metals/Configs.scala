@@ -20,8 +20,13 @@ object Configs {
       val root: String =
         if (isVscode) workspace.toString()
         else workspace.toURI.toString.stripSuffix("/")
+      val pantsPattern =
+        if (workspace.resolve("pants.ini").isFile)
+          List(new FileSystemWatcher(s"$root/**/BUILD"))
+        else List()
+
       new DidChangeWatchedFilesRegistrationOptions(
-        List(
+        (pantsPattern ++ List(
           new FileSystemWatcher(s"$root/*.sbt"),
           new FileSystemWatcher(s"$root/pom.xml"),
           new FileSystemWatcher(s"$root/*.sc"),
@@ -30,7 +35,7 @@ object Configs {
           new FileSystemWatcher(s"$root/project/*.{scala,sbt}"),
           new FileSystemWatcher(s"$root/project/project/*.{scala,sbt}"),
           new FileSystemWatcher(s"$root/project/build.properties")
-        ).asJava
+        )).asJava
       )
     }
   }

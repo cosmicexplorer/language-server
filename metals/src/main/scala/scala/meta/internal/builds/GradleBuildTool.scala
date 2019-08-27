@@ -103,8 +103,9 @@ case class GradleBuildTool() extends BuildTool {
   }
 
   override def digest(
-      workspace: AbsolutePath
-  ): Option[String] = GradleDigest.current(workspace)
+      workspace: AbsolutePath,
+      userConfig: UserConfiguration
+  ): Option[String] = GradleDigest.current(workspace, userConfig)
 
   override def args(
       workspace: AbsolutePath,

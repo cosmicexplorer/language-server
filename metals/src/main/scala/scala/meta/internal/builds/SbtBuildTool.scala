@@ -55,8 +55,9 @@ case class SbtBuildTool(version: String) extends BuildTool {
     allArgs
   }
   override def digest(
-      workspace: AbsolutePath
-  ): Option[String] = SbtDigest.current(workspace)
+      workspace: AbsolutePath,
+      userConfig: UserConfiguration
+  ): Option[String] = SbtDigest.current(workspace, userConfig)
   override val minimumVersion: String = "0.13.17"
   override val recommendedVersion: String = "1.2.8"
 

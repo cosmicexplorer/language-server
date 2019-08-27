@@ -50,8 +50,11 @@ case class MillBuildTool() extends BuildTool {
     }
   }
 
-  override def digest(workspace: AbsolutePath): Option[String] =
-    MillDigest.current(workspace)
+  override def digest(
+      workspace: AbsolutePath,
+      userConfig: UserConfiguration
+  ): Option[String] =
+    MillDigest.current(workspace, userConfig)
 
   override def minimumVersion: String = "0.4.0"
 

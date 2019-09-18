@@ -31,10 +31,13 @@ import scala.meta.io.AbsolutePath
 import tests.MetalsTestEnrichments._
 import tests.TestOrderings._
 import scala.meta.inputs.Input
-import scala.meta.internal.builds.GradleBuildTool
-import scala.meta.internal.builds.SbtBuildTool
-import scala.meta.internal.builds.MavenBuildTool
-import scala.meta.internal.builds.MillBuildTool
+import scala.meta.internal.builds.{
+  GradleBuildTool,
+  MavenBuildTool,
+  MillBuildTool,
+  PantsBuildTool,
+  SbtBuildTool
+}
 import scala.meta.internal.metals.NoopLanguageClient
 import scala.meta.internal.tvp.TreeViewDidChangeParams
 
@@ -200,7 +203,8 @@ final class TestingClient(workspace: AbsolutePath, buffers: Buffers)
         GradleBuildTool(),
         SbtBuildTool(""),
         MavenBuildTool(),
-        MillBuildTool()
+        MillBuildTool(),
+        PantsBuildTool()
       ).map(tool => createParams(tool.toString()))
         .contains(params)
     }

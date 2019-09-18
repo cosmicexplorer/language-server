@@ -32,6 +32,9 @@ jobs:
     - env: TEST="sbt 'slow/testOnly -- tests.feature'"
       script:
         - sbt 'slow/testOnly -- tests.feature'
+    - env: TEST="sbt 'slow/testOnly -- tests.pants'"
+      script:
+        - sbt 'slow/testOnly -- tests.pants'
     - env: TEST="sbt +cross/test"
       script:
         - sbt +cross/test

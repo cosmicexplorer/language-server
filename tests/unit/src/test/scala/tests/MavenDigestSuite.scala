@@ -7,7 +7,7 @@ object MavenDigestSuite extends BaseDigestSuite {
 
   override def digestCurrent(
       root: AbsolutePath
-  ): Option[String] = MavenDigest.current(root)
+  ): Option[String] = MavenDigest.current(root, userConfig)
 
   checkSame(
     "pom.xml",

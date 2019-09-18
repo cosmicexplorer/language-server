@@ -15,7 +15,7 @@ object MillSlowSuite extends BaseImportSuite("mill-import") {
 
   override def currentDigest(
       workspace: AbsolutePath
-  ): Option[String] = MillDigest.current(workspace)
+  ): Option[String] = MillDigest.current(workspace, userConfig)
 
   testAsync("basic") {
     cleanWorkspace()

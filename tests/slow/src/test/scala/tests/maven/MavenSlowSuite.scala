@@ -22,7 +22,7 @@ object MavenSlowSuite extends BaseImportSuite("maven-import") {
 
   override def currentDigest(
       workspace: AbsolutePath
-  ): Option[String] = MavenDigest.current(workspace)
+  ): Option[String] = MavenDigest.current(workspace, userConfig)
 
   testAsync("basic") {
     cleanWorkspace()

@@ -16,7 +16,7 @@ object GradleSlowSuite extends BaseImportSuite("gradle-import") {
 
   override def currentDigest(
       workspace: AbsolutePath
-  ): Option[String] = GradleDigest.current(workspace)
+  ): Option[String] = GradleDigest.current(workspace, userConfig)
 
   testAsync("basic") {
     cleanWorkspace()

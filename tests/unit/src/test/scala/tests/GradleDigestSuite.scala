@@ -7,7 +7,7 @@ object GradleDigestSuite extends BaseDigestSuite {
 
   override def digestCurrent(
       root: AbsolutePath
-  ): Option[String] = GradleDigest.current(root)
+  ): Option[String] = GradleDigest.current(root, userConfig)
 
   checkSame(
     "solo-build.gradle",

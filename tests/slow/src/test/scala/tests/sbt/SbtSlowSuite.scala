@@ -20,7 +20,7 @@ object SbtSlowSuite extends BaseImportSuite("sbt-import") {
 
   override def currentDigest(
       workspace: AbsolutePath
-  ): Option[String] = SbtDigest.current(workspace)
+  ): Option[String] = SbtDigest.current(workspace, userConfig)
 
   testAsync("basic") {
     cleanWorkspace()

@@ -41,6 +41,7 @@ class PantsDigest(userConfig: () => UserConfiguration) extends Digestable {
       workspace.resolve("pants").toString(),
       "filedeps"
     ) ++ pantsTargets.split(" ").map(_.trim).toList
+    scribe.info(s"running '${args.mkString(" ")}'")
     val pantsFileDeps = Process(args, Some(workspace.toFile)).!!.trim
     pantsFileDeps
   }

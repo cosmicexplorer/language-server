@@ -111,9 +111,12 @@ final class BloopInstall(
       .add(() => BloopInstall.destroyProcess(runningProcess))
       .add(() => taskResponse.cancel(false))
 
-    processFuture.foreach(
-      _.toChecksumStatus.foreach(persistChecksumStatus(_, buildTool))
-    )
+    processFuture.foreach { result =>
+      try result.toChecksumStatus.foreach(persistChecksumStatus(_, buildTool))
+      catch {
+        case _: InterruptedException =>
+      }
+    }
     processFuture
   }
 

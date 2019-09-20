@@ -266,6 +266,10 @@ lazy val metals = project
       "com.outr" %% "scribe-slf4j" % "2.6.0", // needed for flyway database migrations
       // for debugging purposes, not strictly needed but nice for productivity
       "com.lihaoyi" %% "pprint" % "0.5.5",
+      // For exporting Pants builds.
+      "com.lihaoyi" %% "ujson" % "0.7.5",
+      "ch.epfl.scala" %% "bloop-config" % V.bloop,
+      "io.get-coursier" %% "coursier" % coursier.util.Properties.version,
       // for producing SemanticDB from Scala source files
       "org.scalameta" %% "scalameta" % V.scalameta,
       "org.scalameta" % "semanticdb-scalac-core" % V.scalameta cross CrossVersion.full
@@ -347,7 +351,7 @@ lazy val mtest = project
     skip.in(publish) := true,
     crossScalaVersions := V.supportedScalaVersions,
     libraryDependencies ++= List(
-      "io.get-coursier" %% "coursier" % "2.0.0-RC2-2",
+      "io.get-coursier" %% "coursier" % coursier.util.Properties.version,
       "org.scalameta" %% "testkit" % V.scalameta
     ) ++ crossSetting(
       scalaVersion.value,

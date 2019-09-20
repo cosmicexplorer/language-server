@@ -3,6 +3,7 @@ package scala.meta.internal.builds
 import java.nio.file.{Files, Path}
 import scala.meta.io.AbsolutePath
 import scala.util.Try
+import java.nio.file.StandardCopyOption
 
 abstract class BuildTool {
   def args(workspace: AbsolutePath): List[String]
@@ -50,7 +51,7 @@ object BuildTool {
       this.getClass.getResourceAsStream(s"/$filePath")
     val outFile = tempDir.resolve(destination.getOrElse(filePath))
     Files.createDirectories(outFile.getParent)
-    Files.copy(embeddedFile, outFile)
+    Files.copy(embeddedFile, outFile, StandardCopyOption.REPLACE_EXISTING)
     outFile
   }
 }

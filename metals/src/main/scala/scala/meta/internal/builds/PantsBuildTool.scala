@@ -2,10 +2,13 @@ package scala.meta.internal.builds
 
 import scala.meta.io.AbsolutePath
 import scala.meta.internal.metals.UserConfiguration
+import scala.meta.internal.metals.JavaBinary
+import java.io.File
+import scala.meta.internal.mtags.ClasspathLoader
+import java.nio.file.Paths
 
 case class PantsBuildTool(userConfig: () => UserConfiguration)
     extends BuildTool {
-
   override def toString(): String = "pants"
   def version: String = "1.0.0"
   def minimumVersion: String = "1.0.0"
@@ -15,42 +18,40 @@ case class PantsBuildTool(userConfig: () => UserConfiguration)
     new PantsDigest(userConfig).current(workspace)
   }
   def args(workspace: AbsolutePath): List[String] = {
-
-//    TODO: This command should run in any repository. Might have to add another user configuration to add optional arguments to pants command.
-    List(
-      workspace.resolve("pants").toString(),
-      "compile.rsc",
-      "--empty-compilation",
-      "--cache-ignore",
-      "--no-use-classpath-jars",
-      "bloop.bloop-export-config",
-      "--sources",
-      "bloop.bloop-gen",
-      "--execution-strategy=subprocess",
-      "compile.errorprone",
-      "--skip"
-    ) ++ userConfig().pantsTargets
-      .getOrElse("::/")
-      .split(" ")
-      .map(_.trim)
-      .toList
-    // TODO: remove this, '--pants-config-files=pants.ini.scalameta' is required for source repo.
-//     List(
-//       workspace.resolve("pants").toString(),
-//       "--pants-config-files=pants.ini.scalameta",
-//       "compile.rsc",
-//       "--empty-compilation",
-//       "--cache-ignore",
-//       "--no-use-classpath-jars",
-//       "bloop.bloop-export-config",
-//       "--sources",
-//       "bloop.bloop-gen",
-//       "--execution-strategy=subprocess"
-//     ) ++ userConfig().pantsTargets
-//       .getOrElse("::/")
-//       .split(" ")
-//       .map(_.trim)
-//       .toList
+    userConfig().pantsTargets match {
+      case None =>
+        List(
+          "echo",
+          "the 'pants-target' setting must be defined."
+        )
+      case Some(targets) =>
+        val classpath = ClasspathLoader
+          .getURLs(this.getClass.getClassLoader)
+          .map(url => Paths.get(url.toURI))
+          .filter(path => {
+            val filename = path.toString()
+            // Slim down the classpath so the console output is not too crazy. In the future,
+            // it would be nice to call `./pants bloop-install` instead.
+            filename.contains("scala-library") ||
+            filename.contains("scala-collection-compat") ||
+            filename.contains("coursier") ||
+            filename.contains("cats") ||
+            filename.contains("ujson") ||
+            filename.contains("upickle") ||
+            filename.contains("bloop") ||
+            filename.contains("circe") ||
+            filename.contains("metals")
+          })
+          .mkString(File.pathSeparator)
+        List(
+          JavaBinary(None),
+          "-classpath",
+          classpath,
+          "scala.meta.internal.pantsbuild.BloopPants",
+          workspace.toString(),
+          targets
+        )
+    }
   }
 }
 

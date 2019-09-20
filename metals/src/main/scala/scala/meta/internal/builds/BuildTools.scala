@@ -4,6 +4,8 @@ import java.nio.file.Files
 import java.util.Properties
 import scala.meta.io.AbsolutePath
 import scala.meta.internal.metals.MetalsEnrichments._
+import scala.meta.internal.metals.UserConfiguration
+import scala.meta.internal.metals.MetalsServerConfig
 
 /**
  * Detects what build tool is used in this workspace.
@@ -19,7 +21,9 @@ import scala.meta.internal.metals.MetalsEnrichments._
  */
 final class BuildTools(
     workspace: AbsolutePath,
-    bspGlobalDirectories: List[AbsolutePath]
+    bspGlobalDirectories: List[AbsolutePath],
+    userConfig: () => UserConfiguration,
+    config: MetalsServerConfig
 ) {
   def isAutoConnectable: Boolean =
     isBloop || isBsp
@@ -71,13 +75,14 @@ final class BuildTools(
     all.isEmpty
   }
   def loadSupported(): Option[BuildTool] = {
-    if (isSbt) Some(SbtBuildTool(workspace))
-    else if (isGradle) Some(GradleBuildTool())
-    else if (isMaven) Some(MavenBuildTool())
-    else if (isMill) Some(MillBuildTool())
-    else if (isPants) Some(PantsBuildTool())
+    if (isSbt) Some(SbtBuildTool(workspace, userConfig, config))
+    else if (isGradle) Some(GradleBuildTool(userConfig))
+    else if (isMaven) Some(MavenBuildTool(userConfig))
+    else if (isMill) Some(MillBuildTool(userConfig))
+    else if (isPants) Some(PantsBuildTool(userConfig))
     else None
   }
+
   override def toString: String = {
     val names = all.mkString("+")
     if (names.isEmpty) "<no build tool>"
@@ -90,5 +95,19 @@ final class BuildTools(
     else if (isMill) MillBuildTool.isMillRelatedPath(workspace, path)
     else if (isPants) PantsBuildTool.isPantsRelatedPath(workspace, path)
     else false
+  }
+}
+
+object BuildTools {
+  def all: List[BuildTool] = {
+    val userConfig: () => UserConfiguration = () => UserConfiguration()
+    val config = MetalsServerConfig.default
+    List(
+      SbtBuildTool.apply("", userConfig, config),
+      GradleBuildTool(userConfig),
+      MavenBuildTool(userConfig),
+      MillBuildTool(userConfig),
+      PantsBuildTool(userConfig)
+    )
   }
 }

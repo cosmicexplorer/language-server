@@ -5,9 +5,9 @@ import scala.meta.internal.metals.BuildInfo
 import scala.meta.internal.metals.UserConfiguration
 import scala.meta.io.AbsolutePath
 import scala.util.Properties
-import scala.meta.internal.metals.MetalsServerConfig
 
-case class GradleBuildTool() extends BuildTool {
+case class GradleBuildTool(userConfig: () => UserConfiguration)
+    extends BuildTool {
 
   private val initScriptName = "init-script.gradle"
 
@@ -102,16 +102,10 @@ case class GradleBuildTool() extends BuildTool {
     AbsolutePath(out)
   }
 
-  override def digest(
-      workspace: AbsolutePath,
-      userConfig: UserConfiguration
-  ): Option[String] = GradleDigest.current(workspace, userConfig)
+  override def digest(workspace: AbsolutePath): Option[String] =
+    GradleDigest.current(workspace)
 
-  override def args(
-      workspace: AbsolutePath,
-      userConfig: () => UserConfiguration,
-      config: MetalsServerConfig
-  ): List[String] = {
+  override def args(workspace: AbsolutePath): List[String] = {
     val cmd = List(
       "--console=plain",
       "--init-script",

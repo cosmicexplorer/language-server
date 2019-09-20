@@ -12,11 +12,11 @@ import tests.BaseImportSuite
 
 object GradleSlowSuite extends BaseImportSuite("gradle-import") {
 
-  val buildTool = GradleBuildTool()
+  val buildTool = GradleBuildTool(() => userConfig)
 
   override def currentDigest(
       workspace: AbsolutePath
-  ): Option[String] = GradleDigest.current(workspace, userConfig)
+  ): Option[String] = GradleDigest.current(workspace)
 
   testAsync("basic") {
     cleanWorkspace()

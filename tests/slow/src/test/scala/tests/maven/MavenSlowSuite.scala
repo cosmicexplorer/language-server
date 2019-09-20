@@ -11,7 +11,7 @@ import tests.BaseImportSuite
 
 object MavenSlowSuite extends BaseImportSuite("maven-import") {
 
-  val buildTool = MavenBuildTool()
+  val buildTool = MavenBuildTool(() => userConfig)
 
   val defaultPom = new String(
     InputStreamIO.readBytes(
@@ -22,7 +22,7 @@ object MavenSlowSuite extends BaseImportSuite("maven-import") {
 
   override def currentDigest(
       workspace: AbsolutePath
-  ): Option[String] = MavenDigest.current(workspace, userConfig)
+  ): Option[String] = MavenDigest.current(workspace)
 
   testAsync("basic") {
     cleanWorkspace()

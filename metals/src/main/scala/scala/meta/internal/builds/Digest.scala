@@ -6,7 +6,6 @@ import java.security.MessageDigest
 import scala.meta.internal.builds.Digest.Status
 import scala.meta.internal.io.PathIO
 import scala.meta.internal.metals.MetalsEnrichments._
-import scala.meta.internal.metals.UserConfiguration
 import scala.meta.internal.mtags.{ListFiles, MD5}
 import scala.meta.io.AbsolutePath
 import scala.util.control.NonFatal
@@ -176,10 +175,7 @@ object Digest {
 }
 
 trait Digestable {
-  def current(
-      workspace: AbsolutePath,
-      userConfig: UserConfiguration
-  ): Option[String] = {
+  def current(workspace: AbsolutePath): Option[String] = {
     if (!workspace.isDirectory) None
     else {
       val digest = MessageDigest.getInstance("MD5")
@@ -189,7 +185,7 @@ trait Digestable {
         digest.update(Digest.version.getBytes(StandardCharsets.UTF_8))
       }
 
-      val isSuccess = digestWorkspace(workspace, digest, userConfig)
+      val isSuccess = digestWorkspace(workspace, digest)
       if (isSuccess) Some(MD5.bytesToHex(digest.digest()))
       else None
     }
@@ -197,7 +193,6 @@ trait Digestable {
 
   protected def digestWorkspace(
       absolutePath: AbsolutePath,
-      digest: MessageDigest,
-      userConfig: UserConfiguration
+      digest: MessageDigest
   ): Boolean
 }

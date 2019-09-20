@@ -1,26 +1,20 @@
 package scala.meta.internal.builds
 
 import scala.meta.io.AbsolutePath
-import scala.meta.internal.metals.{MetalsServerConfig, UserConfiguration}
+import scala.meta.internal.metals.UserConfiguration
 
-case class PantsBuildTool() extends BuildTool {
+case class PantsBuildTool(userConfig: () => UserConfiguration)
+    extends BuildTool {
 
   override def toString(): String = "pants"
   def version: String = "1.0.0"
   def minimumVersion: String = "1.0.0"
   def recommendedVersion: String = "1.0.0"
   def executableName: String = "pants"
-  def digest(
-      workspace: AbsolutePath,
-      userConfig: UserConfiguration
-  ): Option[String] = {
-    PantsDigest.current(workspace, userConfig)
+  def digest(workspace: AbsolutePath): Option[String] = {
+    new PantsDigest(userConfig).current(workspace)
   }
-  def args(
-      workspace: AbsolutePath,
-      userConfig: () => UserConfiguration,
-      config: MetalsServerConfig
-  ): List[String] = {
+  def args(workspace: AbsolutePath): List[String] = {
 
 //    TODO: This command should run in any repository. Might have to add another user configuration to add optional arguments to pants command.
     List(

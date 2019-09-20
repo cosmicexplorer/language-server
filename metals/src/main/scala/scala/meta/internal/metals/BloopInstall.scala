@@ -50,7 +50,7 @@ final class BloopInstall(
   override def toString: String = s"BloopInstall($workspace)"
 
   def runUnconditionally(buildTool: BuildTool): Future[BloopInstallResult] = {
-    val args = buildTool.args(workspace, userConfig, config)
+    val args = buildTool.args(workspace)
     scribe.info(s"running '${args.mkString(" ")}'")
     val result = runArgumentsUnconditionally(buildTool, args)
     result.foreach { e =>
@@ -163,7 +163,7 @@ final class BloopInstall(
       status: Status,
       buildTool: BuildTool
   ): Unit = {
-    buildTool.digest(workspace, userConfig()).foreach { checksum =>
+    buildTool.digest(workspace).foreach { checksum =>
       tables.digests.setStatus(checksum, status)
     }
   }

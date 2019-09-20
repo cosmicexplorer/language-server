@@ -1,6 +1,8 @@
 package tests
 import scala.meta.internal.builds.BuildTools
 import scala.meta.io.AbsolutePath
+import scala.meta.internal.metals.UserConfiguration
+import scala.meta.internal.metals.MetalsServerConfig
 
 object DetectionSuite extends BaseSuite {
 
@@ -22,7 +24,16 @@ object DetectionSuite extends BaseSuite {
   }
   def checkSbt(name: String, layout: String, isTrue: Boolean = true): Unit = {
     test(s"sbt-$name") {
-      check(layout, new BuildTools(_, Nil).isSbt, isTrue)
+      check(
+        layout,
+        new BuildTools(
+          _,
+          Nil,
+          () => UserConfiguration(),
+          MetalsServerConfig.default
+        ).isSbt,
+        isTrue
+      )
     }
   }
 
@@ -82,7 +93,16 @@ object DetectionSuite extends BaseSuite {
       isTrue: Boolean = true
   ): Unit = {
     test(s"gradle-$name") {
-      check(layout, new BuildTools(_, Nil).isGradle, isTrue)
+      check(
+        layout,
+        new BuildTools(
+          _,
+          Nil,
+          () => UserConfiguration(),
+          MetalsServerConfig.default
+        ).isGradle,
+        isTrue
+      )
     }
   }
 
@@ -124,7 +144,16 @@ object DetectionSuite extends BaseSuite {
       isTrue: Boolean = true
   ): Unit = {
     test(s"maven-$name") {
-      check(layout, new BuildTools(_, Nil).isMaven, isTrue)
+      check(
+        layout,
+        new BuildTools(
+          _,
+          Nil,
+          () => UserConfiguration(),
+          MetalsServerConfig.default
+        ).isMaven,
+        isTrue
+      )
     }
   }
 

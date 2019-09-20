@@ -6,13 +6,12 @@ import scala.sys.process._
 
 import scala.meta.internal.metals.UserConfiguration
 
-trait PantsDigestTrait extends Digestable {
+class PantsDigest(userConfig: () => UserConfiguration) extends Digestable {
   override protected def digestWorkspace(
       workspace: AbsolutePath,
-      digest: MessageDigest,
-      userConfig: UserConfiguration
+      digest: MessageDigest
   ): Boolean = {
-    userConfig.pantsTargets match {
+    userConfig().pantsTargets match {
       case None => false
       case Some(pantsTargets) =>
         hasBUILDfilesChanged(workspace, digest, pantsTargets)
@@ -27,10 +26,10 @@ trait PantsDigestTrait extends Digestable {
     val pantsFileDeps: String =
       getPantsFileDependencies(workspace, pantsTargets)
     pantsFileDeps.linesIterator
+      .filter(_.endsWith("BUILD"))
       .map { file =>
         java.nio.file.Paths.get(file).toAbsolutePath.normalize
       }
-      .filter(_.endsWith("BUILD"))
       .forall(file => Digest.digestFile(AbsolutePath(file), digest))
   }
 
@@ -46,5 +45,3 @@ trait PantsDigestTrait extends Digestable {
     pantsFileDeps
   }
 }
-
-object PantsDigest extends PantsDigestTrait

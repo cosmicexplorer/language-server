@@ -1,40 +1,27 @@
 package tests
 
-import scala.meta.internal.builds.PantsDigestTrait
+import scala.meta.internal.builds.PantsDigest
 import scala.meta.internal.metals.UserConfiguration
 import scala.meta.io.AbsolutePath
 
-object TestPantsDigest extends PantsDigestTrait {
-
-  private var currentFileDeps: String = ""
-  def setFileDeps(filedeps: String): Unit = {
-    currentFileDeps = filedeps
-  }
-
-  override protected def getPantsFileDependencies(
-      workspace: AbsolutePath,
-      pantsTargets: String
-  ) = {
-    currentFileDeps
-      .split(" ")
-      .map(workspace + "/" + _)
-      .mkString(" ")
-  }
-}
-
 object PantsDigestSuite extends BaseDigestSuite {
-
-  TestPantsDigest.setFileDeps("")
   override def digestCurrent(
       root: AbsolutePath
   ): Option[String] = {
     val userConfig = new UserConfiguration(
       pantsTargets = Option("::")
     )
-    TestPantsDigest.current(root, userConfig)
+    val fakeDigest: PantsDigest = new PantsDigest(() => userConfig) {
+      override protected def getPantsFileDependencies(
+          workspace: AbsolutePath,
+          pantsTargets: String
+      ): String = {
+        workspace.resolve("BUILD").toString()
+      }
+    }
+    fakeDigest.current(root)
   }
 
-  TestPantsDigest.setFileDeps("BUILD")
   checkSame(
     "same-BUILD",
     """

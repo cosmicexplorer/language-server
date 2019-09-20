@@ -6,13 +6,11 @@ import scala.meta.io.AbsolutePath
 import scala.collection.mutable
 import java.security.MessageDigest
 import scala.meta.internal.mtags.MtagsEnrichments._
-import scala.meta.internal.metals.UserConfiguration
 
 object MillDigest extends Digestable {
   override protected def digestWorkspace(
       workspace: AbsolutePath,
-      digest: MessageDigest,
-      userConfig: UserConfiguration
+      digest: MessageDigest
   ): Boolean = {
     def analyzeBuildScript(file: AbsolutePath): Boolean = {
       val imported = findImportedScripts(file)

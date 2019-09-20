@@ -1,21 +1,13 @@
 package scala.meta.internal.builds
 
 import java.nio.file.{Files, Path}
-import scala.meta.internal.metals._
 import scala.meta.io.AbsolutePath
 import scala.util.Try
 
 abstract class BuildTool {
-  def args(
-      workspace: AbsolutePath,
-      userConfig: () => UserConfiguration,
-      config: MetalsServerConfig
-  ): List[String]
+  def args(workspace: AbsolutePath): List[String]
 
-  def digest(
-      workspace: AbsolutePath,
-      userConfig: UserConfiguration
-  ): Option[String]
+  def digest(workspace: AbsolutePath): Option[String]
 
   def version: String
 

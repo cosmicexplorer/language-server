@@ -11,11 +11,11 @@ import tests.BaseImportSuite
 
 object MillSlowSuite extends BaseImportSuite("mill-import") {
 
-  val buildTool = MillBuildTool()
+  val buildTool = MillBuildTool(() => userConfig)
 
   override def currentDigest(
       workspace: AbsolutePath
-  ): Option[String] = MillDigest.current(workspace, userConfig)
+  ): Option[String] = MillDigest.current(workspace)
 
   testAsync("basic") {
     cleanWorkspace()

@@ -18,7 +18,7 @@ import tests.BaseImportSuite
 
 object PantsSlowSuite extends BaseImportSuite("pants") {
 
-  val buildTool = PantsBuildTool()
+  val buildTool = PantsBuildTool(() => userConfig)
   val src_path = "src/scala/org/pantsbuild/pants-metals"
 
   def exec(cmd: String): String =
@@ -106,7 +106,7 @@ jar_library(
     val userconfig = new UserConfiguration(
       pantsTargets = Option(s"$src_path::")
     )
-    PantsDigest.current(workspace, userconfig)
+    new PantsDigest(() => userconfig).current(workspace)
   }
 
   testAsync("basic") {

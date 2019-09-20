@@ -3,7 +3,6 @@ package scala.meta.internal.builds
 import java.security.MessageDigest
 import scala.meta.internal.builds.Digest.digestScala
 import scala.meta.internal.metals.MetalsEnrichments._
-import scala.meta.internal.metals.UserConfiguration
 import scala.meta.internal.mtags.ListFiles
 import scala.meta.io.AbsolutePath
 
@@ -11,8 +10,7 @@ object SbtDigest extends Digestable {
 
   override protected def digestWorkspace(
       workspace: AbsolutePath,
-      digest: MessageDigest,
-      userConfig: UserConfiguration
+      digest: MessageDigest
   ): Boolean = {
     val project = workspace.resolve("project")
     digestSbtFiles(workspace, digest) &&

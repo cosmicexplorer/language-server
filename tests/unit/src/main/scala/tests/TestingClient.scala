@@ -31,15 +31,9 @@ import scala.meta.io.AbsolutePath
 import tests.MetalsTestEnrichments._
 import tests.TestOrderings._
 import scala.meta.inputs.Input
-import scala.meta.internal.builds.{
-  GradleBuildTool,
-  MavenBuildTool,
-  MillBuildTool,
-  PantsBuildTool,
-  SbtBuildTool
-}
 import scala.meta.internal.metals.NoopLanguageClient
 import scala.meta.internal.tvp.TreeViewDidChangeParams
+import scala.meta.internal.builds.BuildTools
 
 /**
  * Fake LSP client that responds to notifications/requests initiated by the server.
@@ -199,13 +193,8 @@ final class TestingClient(workspace: AbsolutePath, buffers: Buffers)
     def isSameMessage(
         createParams: String => ShowMessageRequestParams
     ): Boolean = {
-      Set(
-        GradleBuildTool(),
-        SbtBuildTool(""),
-        MavenBuildTool(),
-        MillBuildTool(),
-        PantsBuildTool()
-      ).map(tool => createParams(tool.toString()))
+      BuildTools.all
+        .map(tool => createParams(tool.toString()))
         .contains(params)
     }
     CompletableFuture.completedFuture {

@@ -16,11 +16,11 @@ import scala.meta.io.AbsolutePath
 
 object SbtSlowSuite extends BaseImportSuite("sbt-import") {
 
-  val buildTool = SbtBuildTool("")
+  val buildTool = SbtBuildTool("", () => userConfig, serverConfig)
 
   override def currentDigest(
       workspace: AbsolutePath
-  ): Option[String] = SbtDigest.current(workspace, userConfig)
+  ): Option[String] = SbtDigest.current(workspace)
 
   testAsync("basic") {
     cleanWorkspace()
@@ -379,7 +379,9 @@ object SbtSlowSuite extends BaseImportSuite("sbt-import") {
       )
       _ = assertNoDiff(
         client.workspaceShowMessages,
-        IncompatibleBuildToolVersion.params(SbtBuildTool("0.13.15")).getMessage
+        IncompatibleBuildToolVersion
+          .params(SbtBuildTool("0.13.15", () => userConfig, serverConfig))
+          .getMessage
       )
     } yield ()
   }

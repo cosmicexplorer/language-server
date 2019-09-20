@@ -201,7 +201,12 @@ class MetalsLanguageServer(
     buildTargets.setWorkspaceDirectory(workspace)
     tables = register(new Tables(workspace, time, config))
     buildTargets.setTables(tables)
-    buildTools = new BuildTools(workspace, bspGlobalDirectories)
+    buildTools = new BuildTools(
+      workspace,
+      bspGlobalDirectories,
+      () => userConfig,
+      config
+    )
     fileSystemSemanticdbs = new FileSystemSemanticdbs(
       buildTargets,
       charset,
@@ -1166,7 +1171,7 @@ class MetalsLanguageServer(
             buildTool.minimumVersion,
             buildTool.version
           )) {
-          buildTool.digest(workspace, userConfig) match {
+          buildTool.digest(workspace) match {
             case None =>
               scribe.warn(s"Skipping build import, no checksum.")
               Future.successful(BuildChange.None)

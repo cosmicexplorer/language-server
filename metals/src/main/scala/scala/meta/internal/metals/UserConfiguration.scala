@@ -94,14 +94,14 @@ object UserConfiguration {
         |separators (even on Windows).
         |""".stripMargin
     ),
-    // TODO: add description
     UserConfigurationOption(
       "pants-targets",
       """empty string `""`.""",
       "::/",
       "pants script",
-      """. List of pants targets
-        |Should be relative to the workspace root directory and use forward slashes / for file
+      """The pants targets to export.
+        |Must be relative to the workspace root directory and use forward
+        |slashes / for file |separators (even on Windows).
         |""".stripMargin
     )
   )
@@ -179,7 +179,6 @@ object UserConfiguration {
     }
     val pantsTargets =
       getStringKey("pants-targets")
-    pprint.log(pantsTargets)
 
     if (errors.isEmpty) {
       Right(

@@ -7,7 +7,7 @@ object MillDigestSuite extends BaseDigestSuite {
 
   override def digestCurrent(
       root: AbsolutePath
-  ): Option[String] = MillDigest.current(root, userConfig)
+  ): Option[String] = MillDigest.current(root)
 
   checkSame(
     "solo-build.sc",

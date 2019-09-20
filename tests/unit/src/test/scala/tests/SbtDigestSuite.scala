@@ -7,7 +7,7 @@ object SbtDigestSuite extends BaseDigestSuite {
 
   override def digestCurrent(
       root: AbsolutePath
-  ): Option[String] = SbtDigest.current(root, userConfig)
+  ): Option[String] = SbtDigest.current(root)
 
   checkSame(
     "same-build.sbt",

@@ -6,7 +6,7 @@ import scala.meta.internal.metals.MetalsEnrichments._
 import scala.meta.internal.metals.JavaBinary
 
 case class MavenBuildTool(userConfig: () => UserConfiguration)
-    extends BuildTool {
+    extends BloopPluginBuildTool {
 
   private lazy val embeddedMavenLauncher: AbsolutePath = {
     val out = BuildTool.copyFromResource(tempDir, "maven-wrapper.jar")

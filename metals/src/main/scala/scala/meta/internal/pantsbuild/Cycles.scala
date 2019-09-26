@@ -6,7 +6,10 @@ import scala.collection.mutable
 case class Cycles(
     children: collection.Map[String, List[String]],
     parents: collection.Map[String, String]
-)
+) {
+  def acyclicDependency(target: String): String =
+    parents.getOrElse(target, target)
+}
 object Cycles {
   def findConnectedComponents(js: Value): Cycles = {
     val graph = Graph.fromExport(js)

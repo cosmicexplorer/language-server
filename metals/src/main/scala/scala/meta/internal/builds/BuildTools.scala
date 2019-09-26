@@ -6,6 +6,8 @@ import scala.meta.io.AbsolutePath
 import scala.meta.internal.metals.MetalsEnrichments._
 import scala.meta.internal.metals.UserConfiguration
 import scala.meta.internal.metals.MetalsServerConfig
+import scala.meta.internal.io.PathIO
+import scala.concurrent.ExecutionContext
 
 /**
  * Detects what build tool is used in this workspace.
@@ -24,7 +26,7 @@ final class BuildTools(
     bspGlobalDirectories: List[AbsolutePath],
     userConfig: () => UserConfiguration,
     config: MetalsServerConfig
-) {
+)(implicit ec: ExecutionContext) {
   def isAutoConnectable: Boolean =
     isBloop || isBsp
   def isBloop: Boolean = {
@@ -59,6 +61,16 @@ final class BuildTools(
   def isMaven: Boolean = workspace.resolve("pom.xml").isFile
   def isPants: Boolean = workspace.resolve("pants.ini").isFile
   def isBazel: Boolean = workspace.resolve("WORKSPACE").isFile
+
+  def allAvailable: List[BuildTool] = {
+    List(
+      SbtBuildTool("", userConfig, config),
+      GradleBuildTool(userConfig),
+      MavenBuildTool(userConfig),
+      MillBuildTool(userConfig),
+      PantsBuildTool(userConfig)
+    )
+  }
 
   def all: List[String] = {
     val buf = List.newBuilder[String]
@@ -99,15 +111,11 @@ final class BuildTools(
 }
 
 object BuildTools {
-  def all: List[BuildTool] = {
-    val userConfig: () => UserConfiguration = () => UserConfiguration()
-    val config = MetalsServerConfig.default
-    List(
-      SbtBuildTool.apply("", userConfig, config),
-      GradleBuildTool(userConfig),
-      MavenBuildTool(userConfig),
-      MillBuildTool(userConfig),
-      PantsBuildTool(userConfig)
-    )
-  }
+  def default(workspace: AbsolutePath = PathIO.workingDirectory): BuildTools =
+    new BuildTools(
+      workspace,
+      Nil,
+      () => UserConfiguration(),
+      MetalsServerConfig.default
+    )(ExecutionContext.global)
 }

@@ -4,9 +4,14 @@ import java.nio.file.{Files, Path}
 import scala.meta.io.AbsolutePath
 import scala.util.Try
 import java.nio.file.StandardCopyOption
+import scala.meta.internal.metals.BloopInstallResult
+import scala.concurrent.Future
 
 abstract class BuildTool {
-  def args(workspace: AbsolutePath): List[String]
+  def bloopInstall(
+      workspace: AbsolutePath,
+      systemProcess: List[String] => Future[BloopInstallResult]
+  ): Future[BloopInstallResult]
 
   def digest(workspace: AbsolutePath): Option[String]
 

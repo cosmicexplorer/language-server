@@ -50,16 +50,20 @@ final class BloopInstall(
   override def toString: String = s"BloopInstall($workspace)"
 
   def runUnconditionally(buildTool: BuildTool): Future[BloopInstallResult] = {
-    val args = buildTool.args(workspace)
-    scribe.info(s"running '${args.mkString(" ")}'")
-    val result = runArgumentsUnconditionally(buildTool, args)
-    result.foreach { e =>
-      if (e.isFailed) {
-        // Record the exact command that failed to help troubleshooting.
-        scribe.error(s"$buildTool command failed: ${args.mkString(" ")}")
+    buildTool.bloopInstall(
+      workspace,
+      args => {
+        scribe.info(s"running '${args.mkString(" ")}'")
+        val process = runArgumentsUnconditionally(buildTool, args)
+        process.foreach { e =>
+          if (e.isFailed) {
+            // Record the exact command that failed to help troubleshooting.
+            scribe.error(s"$buildTool command failed: ${args.mkString(" ")}")
+          }
+        }
+        process
       }
-    }
-    result
+    )
   }
 
   private def runArgumentsUnconditionally(

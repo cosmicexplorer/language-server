@@ -146,6 +146,7 @@ lazy val V = new {
   val sbtBloop = bloop
   val gradleBloop = bloop
   val scalafmt = "2.0.1"
+  val coursier = _root_.coursier.util.Properties.version
   // List of supported Scala versions in SemanticDB. Needs to be manually updated
   // for every SemanticDB upgrade.
   def supportedScalaVersions =
@@ -219,6 +220,7 @@ lazy val mtags = project
 lazy val metals = project
   .settings(
     fork.in(Compile, run) := true,
+    mainClass.in(Compile) := Some("scala.meta.metals.Main"),
     // As a general rule of thumb, we try to keep Scala dependencies to a minimum.
     libraryDependencies ++= List(
       // =================
@@ -269,7 +271,7 @@ lazy val metals = project
       // For exporting Pants builds.
       "com.lihaoyi" %% "ujson" % "0.7.5",
       "ch.epfl.scala" %% "bloop-config" % V.bloop,
-      "io.get-coursier" %% "coursier" % coursier.util.Properties.version,
+      "io.get-coursier" %% "coursier" % V.coursier,
       // for producing SemanticDB from Scala source files
       "org.scalameta" %% "scalameta" % V.scalameta,
       "org.scalameta" % "semanticdb-scalac-core" % V.scalameta cross CrossVersion.full

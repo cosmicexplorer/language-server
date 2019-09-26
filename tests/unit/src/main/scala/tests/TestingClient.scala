@@ -193,7 +193,9 @@ final class TestingClient(workspace: AbsolutePath, buffers: Buffers)
     def isSameMessage(
         createParams: String => ShowMessageRequestParams
     ): Boolean = {
-      BuildTools.all
+      BuildTools
+        .default()
+        .allAvailable
         .map(tool => createParams(tool.toString()))
         .contains(params)
     }

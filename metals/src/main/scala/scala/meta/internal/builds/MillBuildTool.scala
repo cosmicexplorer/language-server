@@ -6,7 +6,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 case class MillBuildTool(userConfig: () => UserConfiguration)
-    extends BuildTool {
+    extends BloopPluginBuildTool {
 
   private val predefScriptName = "predef.sc"
 

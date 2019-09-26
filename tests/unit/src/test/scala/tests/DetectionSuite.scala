@@ -1,8 +1,7 @@
 package tests
+
 import scala.meta.internal.builds.BuildTools
 import scala.meta.io.AbsolutePath
-import scala.meta.internal.metals.UserConfiguration
-import scala.meta.internal.metals.MetalsServerConfig
 
 object DetectionSuite extends BaseSuite {
 
@@ -26,12 +25,7 @@ object DetectionSuite extends BaseSuite {
     test(s"sbt-$name") {
       check(
         layout,
-        new BuildTools(
-          _,
-          Nil,
-          () => UserConfiguration(),
-          MetalsServerConfig.default
-        ).isSbt,
+        p => BuildTools.default(p).isSbt,
         isTrue
       )
     }
@@ -95,12 +89,7 @@ object DetectionSuite extends BaseSuite {
     test(s"gradle-$name") {
       check(
         layout,
-        new BuildTools(
-          _,
-          Nil,
-          () => UserConfiguration(),
-          MetalsServerConfig.default
-        ).isGradle,
+        p => BuildTools.default(p).isGradle,
         isTrue
       )
     }
@@ -146,12 +135,7 @@ object DetectionSuite extends BaseSuite {
     test(s"maven-$name") {
       check(
         layout,
-        new BuildTools(
-          _,
-          Nil,
-          () => UserConfiguration(),
-          MetalsServerConfig.default
-        ).isMaven,
+        p => BuildTools.default(p).isMaven,
         isTrue
       )
     }

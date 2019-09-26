@@ -5,6 +5,7 @@ import java.security.MessageDigest
 import scala.sys.process._
 
 import scala.meta.internal.metals.UserConfiguration
+import java.nio.file.Paths
 
 class PantsDigest(userConfig: () => UserConfiguration) extends Digestable {
   override protected def digestWorkspace(
@@ -12,7 +13,12 @@ class PantsDigest(userConfig: () => UserConfiguration) extends Digestable {
       digest: MessageDigest
   ): Boolean = {
     userConfig().pantsTargets match {
-      case None => false
+      case None =>
+        scribe.info(
+          "skipping build import for Pants workspace since the setting 'pants-targets' is not defined. " +
+            "To fix this problem, update the 'pants-targets' setting to list what build targets should be imported in this workspace."
+        )
+        false
       case Some(pantsTargets) =>
         hasBUILDfilesChanged(workspace, digest, pantsTargets)
     }
@@ -28,7 +34,7 @@ class PantsDigest(userConfig: () => UserConfiguration) extends Digestable {
     pantsFileDeps.linesIterator
       .filter(_.endsWith("BUILD"))
       .map { file =>
-        java.nio.file.Paths.get(file).toAbsolutePath.normalize
+        Paths.get(file).toAbsolutePath.normalize
       }
       .forall(file => Digest.digestFile(AbsolutePath(file), digest))
   }

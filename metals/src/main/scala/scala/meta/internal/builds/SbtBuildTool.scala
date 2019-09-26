@@ -10,7 +10,7 @@ case class SbtBuildTool(
     version: String,
     userConfig: () => UserConfiguration,
     config: MetalsServerConfig
-) extends BuildTool {
+) extends BloopPluginBuildTool {
 
   /**
    * Returns path to a local copy of sbt-launch.jar.

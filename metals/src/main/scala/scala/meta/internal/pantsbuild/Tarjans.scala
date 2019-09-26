@@ -39,14 +39,14 @@ object Tarjans {
       }
       if (lowlink(v) == index(v)) {
         val component = mutable.Buffer.empty[Int]
-        var done = false
-        while (!done) {
+        var continue = true
+        while (continue) {
           val w = stack.head
           stack = stack.tail
           onStack(w) = false
           component.append(w)
           if (w == v) {
-            done = true
+            continue = false
           }
         }
         components.append(component)

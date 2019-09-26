@@ -2,13 +2,18 @@ package scala.meta.internal.builds
 
 import scala.meta.io.AbsolutePath
 import scala.meta.internal.metals.UserConfiguration
-import scala.meta.internal.metals.JavaBinary
-import java.io.File
-import scala.meta.internal.mtags.ClasspathLoader
-import java.nio.file.Paths
+import scala.meta.internal.pantsbuild.BloopPants
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+import scala.meta.internal.metals.BloopInstallResult
+import scala.meta.internal.metals.Timer
+import scala.meta.internal.metals.Time
+import scala.util.Failure
+import scala.util.Success
 
-case class PantsBuildTool(userConfig: () => UserConfiguration)
-    extends BuildTool {
+case class PantsBuildTool(userConfig: () => UserConfiguration)(
+    implicit ec: ExecutionContext
+) extends BuildTool {
   override def toString(): String = "pants"
   def version: String = "1.0.0"
   def minimumVersion: String = "1.0.0"
@@ -17,40 +22,26 @@ case class PantsBuildTool(userConfig: () => UserConfiguration)
   def digest(workspace: AbsolutePath): Option[String] = {
     new PantsDigest(userConfig).current(workspace)
   }
-  def args(workspace: AbsolutePath): List[String] = {
+
+  def bloopInstall(
+      workspace: AbsolutePath,
+      systemProcess: List[String] => Future[BloopInstallResult]
+  ): Future[BloopInstallResult] = {
     userConfig().pantsTargets match {
       case None =>
-        List(
-          "echo",
-          "the 'pants-target' setting must be defined."
-        )
+        Future.successful(BloopInstallResult.Failed(1))
       case Some(targets) =>
-        val classpath = ClasspathLoader
-          .getURLs(this.getClass.getClassLoader)
-          .map(url => Paths.get(url.toURI))
-          .filter(path => {
-            val filename = path.toString()
-            // Slim down the classpath so the console output is not too crazy. In the future,
-            // it would be nice to call `./pants bloop-install` instead.
-            filename.contains("scala-library") ||
-            filename.contains("scala-collection-compat") ||
-            filename.contains("coursier") ||
-            filename.contains("cats") ||
-            filename.contains("ujson") ||
-            filename.contains("upickle") ||
-            filename.contains("bloop") ||
-            filename.contains("circe") ||
-            filename.contains("metals")
-          })
-          .mkString(File.pathSeparator)
-        List(
-          JavaBinary(None),
-          "-classpath",
-          classpath,
-          "scala.meta.internal.pantsbuild.BloopPants",
-          workspace.toString(),
-          targets
-        )
+        Future {
+          val timer = new Timer(Time.system)
+          BloopPants.bloopInstall(workspace.toNIO, targets, isCached = false) match {
+            case Failure(error) =>
+              scribe.error(s"pants bloopInstall failed: $error")
+              BloopInstallResult.Failed(1)
+            case Success(count) =>
+              scribe.info(s"Exported ${count} Pants targets(s) in $timer")
+              BloopInstallResult.Installed
+          }
+        }
     }
   }
 }

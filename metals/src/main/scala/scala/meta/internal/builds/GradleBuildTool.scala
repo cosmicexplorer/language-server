@@ -7,7 +7,7 @@ import scala.meta.io.AbsolutePath
 import scala.util.Properties
 
 case class GradleBuildTool(userConfig: () => UserConfiguration)
-    extends BuildTool {
+    extends BloopPluginBuildTool {
 
   private val initScriptName = "init-script.gradle"
 

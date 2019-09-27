@@ -3,7 +3,6 @@ package scala.meta.internal.builds
 import java.security.MessageDigest
 import scala.meta.internal.builds.Digest.digestScala
 import scala.meta.internal.metals.MetalsEnrichments._
-import scala.meta.internal.mtags.ListFiles
 import scala.meta.io.AbsolutePath
 
 object SbtDigest extends Digestable {

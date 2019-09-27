@@ -6,7 +6,7 @@ import java.security.MessageDigest
 import scala.meta.internal.builds.Digest.Status
 import scala.meta.internal.io.PathIO
 import scala.meta.internal.metals.MetalsEnrichments._
-import scala.meta.internal.mtags.{ListFiles, MD5}
+import scala.meta.internal.mtags.MD5
 import scala.meta.io.AbsolutePath
 import scala.util.control.NonFatal
 import scala.xml.Node

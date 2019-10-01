@@ -86,7 +86,20 @@ object BloopPants {
       target: String
   ): Unit = {
     val exportTimer = new Timer(Time.system)
-    val pantsBinary = workspace.resolve("pants").toString()
+    // If the `$OS_PANTS_SRC` environment variable is set, use the pants from there!
+    val pantsBinary = sys.env.get("OS_PANTS_SRC") match {
+      case Some(pants_src_dir) => {
+        // The generated `pants.ini` has a version constraint that would cause pants to error out
+        // when running from source.
+        Files.delete(workspace.resolve("pants.ini"))
+        // We still need to have a file named "pants" at the buildroot, at all times, but it is
+        // allowed to be empty.
+        Files.write(workspace.resolve("pants"), "".getBytes)
+        // Return the path to the `pants` script within the `$OS_PANTS_SRC` directory.
+        Paths.get(pants_src_dir).resolve("pants").toString
+      }
+      case None => workspace.resolve("pants").toString
+    }
     val commandName = s"$pantsBinary export $target"
     scribe.info(s"running '$commandName', this may take a while...")
     val command = List[String](
@@ -123,17 +136,15 @@ private class BloopPants(
 
   val targets = json.obj("targets").obj
   val libraries = json.obj("libraries").obj
-  val scalaJars = libraries.collect {
-    case (module, jar) if isScalaJar(module) =>
-      Paths.get(jar.obj("default").str)
-  }.toSeq
-  val compilerVersion = libraries.keysIterator
-    .collectFirst {
-      case module if module.startsWith(scalaCompiler) =>
-        module.stripPrefix(scalaCompiler)
-    }
-    .getOrElse {
-      throw new NoSuchElementException(scalaCompiler)
+  val (scalaJars, compilerVersion) =
+    if (json.obj.keys.toSet.apply("scala_platform")) {
+      val scalaPlatform = json.obj("scala_platform")
+      val scalaJars =
+        scalaPlatform.obj("compiler_classpath").arr.map(x => Paths.get(x.str))
+      val compilerVersion = scalaPlatform.obj("scala_version").str
+      (scalaJars, compilerVersion)
+    } else {
+      throw new NoSuchElementException("???")
     }
 
   def run(): Int = {
